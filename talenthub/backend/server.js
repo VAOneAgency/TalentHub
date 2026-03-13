@@ -2,9 +2,9 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-
 const projectRoutes = require('./routes/projects');
 const applicationRoutes = require('./routes/applications');
+const authRoutes = require('./routes/auth'); 
 
 const app = express();
 
@@ -14,6 +14,7 @@ app.use(express.json());
 // ─── Routes owned by this feature ────────────────────────────────────────────
 app.use('/api/projects', projectRoutes);
 app.use('/api/applications', applicationRoutes);
+app.use('/api/auth', authRoutes);  
 
 // ─── Health check ─────────────────────────────────────────────────────────────
 app.get('/api/health', (req, res) => res.json({ status: 'ok', feature: 'projects-applications' }));
