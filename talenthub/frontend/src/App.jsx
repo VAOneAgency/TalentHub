@@ -9,6 +9,7 @@ import MyListings from './pages/MyListings';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ProtectedRoute from './components/ProtectedRoute';
+import Navbar from './components/Navbar';
 import { AuthProvider } from './context/AuthContext';
 import './styles.css';
 
@@ -16,6 +17,7 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <Navbar />
         <Routes>
           {/* Auth */}
           <Route path="/login" element={<Login />} />
