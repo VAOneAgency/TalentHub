@@ -6,37 +6,60 @@ import ProjectForm from './pages/ProjectForm';
 import MyApplications from './pages/MyApplications';
 import ProjectApplicants from './pages/ProjectApplicants';
 import MyListings from './pages/MyListings';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import ProtectedRoute from './components/ProtectedRoute';
+import { AuthProvider } from './context/AuthContext';
 import './styles.css';
 
-/**
- * Routes owned by this feature (Project Listings & Applications).
- *
- * Partner's routes (Auth & Dashboard) should be added at the top level
- * alongside these — do NOT modify this file's existing routes.
- *
- * Expected partner routes (for reference only):
- *   /login, /register, /dashboard
- */
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Public */}
-        <Route path="/projects" element={<BrowseProjects />} />
-        <Route path="/projects/new" element={<ProjectForm />} />
-        <Route path="/projects/:id" element={<ProjectDetail />} />
-        <Route path="/projects/:id/edit" element={<ProjectForm />} />
-        <Route path="/projects/:id/applicants" element={<ProjectApplicants />} />
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Auth */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
-        {/* Freelancer */}
-        <Route path="/my-applications" element={<MyApplications />} />
+          {/* Public */}
+          <Route path="/projects" element={<BrowseProjects />} />
+          <Route path="/projects/:id" element={<ProjectDetail />} />
 
-        {/* Client */}
-        <Route path="/my-listings" element={<MyListings />} />
+          {/* Any logged in user */}
+          <Route path="/projects/new" element={
+            <ProtectedRoute>
+              <ProjectForm />
+            </ProtectedRoute>
+          } />
+          <Route path="/projects/:id/edit" element={
+            <ProtectedRoute>
+              <ProjectForm />
+            </ProtectedRoute>
+          } />
 
-        {/* Default redirect */}
-        <Route path="/" element={<Navigate to="/projects" replace />} />
-      </Routes>
-    </BrowserRouter>
+          {/* Freelancer only */}
+          <Route path="/my-applications" element={
+            <ProtectedRoute allowedRoles={['freelancer']}>
+              <MyApplications />
+            </ProtectedRoute>
+          } />
+
+          {/* Client only */}
+          <Route path="/my-listings" element={
+            <ProtectedRoute allowedRoles={['client']}>
+              <MyListings />
+            </ProtectedRoute>
+          } />
+          <Route path="/projects/:id/applicants" element={
+            <ProtectedRoute allowedRoles={['client']}>
+              <ProjectApplicants />
+            </ProtectedRoute>
+          } />
+
+          {/* Default redirect */}
+          <Route path="/" element={<Navigate to="/projects" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
