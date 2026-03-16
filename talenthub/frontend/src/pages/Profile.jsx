@@ -52,7 +52,7 @@ export default function Profile() {
 
   if (!profile) return <p style={{ padding: 40 }}>Loading...</p>;
 
-  const containerStyle = { maxWidth: 600, margin: '40px auto', padding: '0 20px' };
+  const containerStyle = { maxWidth: 600, margin: '40px', padding: '0 20px' };
   const inputStyle = { width: '100%', padding: '10px 12px', marginBottom: 12, border: '1px solid #ccc', borderRadius: 6, fontSize: 14, boxSizing: 'border-box' };
   const labelStyle = { fontSize: 13, color: '#666', marginBottom: 4, display: 'block' };
   const buttonStyle = { padding: '10px 20px', backgroundColor: '#2d2d2d', color: '#fff', border: 'none', borderRadius: 6, fontSize: 14, cursor: 'pointer', marginRight: 10 };
