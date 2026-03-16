@@ -6,6 +6,7 @@ const projectRoutes = require('./routes/projects');
 const applicationRoutes = require('./routes/applications');
 const authRoutes = require('./routes/auth'); 
 const profileRoutes = require('./routes/profile');
+const uploadRoutes = require('./routes/upload');
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/auth', authRoutes);  
 app.use('/api/profile', profileRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // ─── Health check ─────────────────────────────────────────────────────────────
 app.get('/api/health', (req, res) => res.json({ status: 'ok', feature: 'projects-applications' }));
