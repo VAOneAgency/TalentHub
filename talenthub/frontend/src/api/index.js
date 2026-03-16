@@ -3,7 +3,7 @@
  * Reads token from localStorage key 'talenthub_token'
  * (key set by partner's auth system — do NOT change)
  */
-const BASE = '/api';
+const BASE = import.meta.env.VITE_API_URL || '/api';
 
 const getToken = () => localStorage.getItem('talenthub_token');
 
@@ -15,9 +15,16 @@ const request = async (method, path, body) => {
   const token = getToken();
   if (token) opts.headers['Authorization'] = `Bearer ${token}`;
   if (body) opts.body = JSON.stringify(body);
-
   const res = await fetch(`${BASE}${path}`, opts);
-  const data = await res.json();
+  const text = await res.text();
+  let data = {};
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = { message: text };
+    }
+  }
   if (!res.ok) throw new Error(data.message || 'Request failed');
   return data;
 };
