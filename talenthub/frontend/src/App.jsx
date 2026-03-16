@@ -12,6 +12,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
 import { AuthProvider } from './context/AuthContext';
 import './styles.css';
+import Profile from './pages/Profile';
 
 export default function App() {
   return (
@@ -55,6 +56,13 @@ export default function App() {
           <Route path="/projects/:id/applicants" element={
             <ProtectedRoute allowedRoles={['client']}>
               <ProjectApplicants />
+            </ProtectedRoute>
+          } />
+
+          {/* Any logged in user */}
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           } />
 
