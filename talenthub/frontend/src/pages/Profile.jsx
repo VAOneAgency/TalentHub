@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 export default function Profile() {
@@ -8,6 +8,9 @@ export default function Profile() {
   const [form, setForm] = useState({});
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const fileInputRef = useRef();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -30,6 +33,33 @@ export default function Profile() {
   }, []);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const uploadAvatar = async (file) => {
+    setUploading(true);
+    const token = localStorage.getItem('talenthub_token');
+    const formData = new FormData();
+    formData.append('avatar', file);
+    const res = await fetch('/api/upload/avatar', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
+    });
+    const data = await res.json();
+    setUploading(false);
+    if (data.url) setForm((f) => ({ ...f, avatar: data.url }));
+  };
+
+  const handleFileDrop = (e) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files[0];
+    if (file) uploadAvatar(file);
+  };
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) uploadAvatar(file);
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -101,8 +131,36 @@ export default function Profile() {
         </>
       ) : (
         <>
-          <label style={labelStyle}>Avatar URL</label>
-          <input name="avatar" placeholder="https://..." value={form.avatar} onChange={handleChange} style={inputStyle} />
+          {/* Avatar Upload */}
+          <label style={labelStyle}>Profile Photo</label>
+          <div
+            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+            onDragLeave={() => setDragOver(false)}
+            onDrop={handleFileDrop}
+            onClick={() => fileInputRef.current.click()}
+            style={{
+              border: `2px dashed ${dragOver ? '#2d2d2d' : '#ccc'}`,
+              borderRadius: 8,
+              padding: '24px',
+              textAlign: 'center',
+              cursor: 'pointer',
+              marginBottom: 12,
+              backgroundColor: dragOver ? '#f5f5f5' : 'transparent',
+              transition: 'all 0.2s',
+            }}
+          >
+            {uploading ? (
+              <p style={{ margin: 0, color: '#666' }}>Uploading...</p>
+            ) : form.avatar ? (
+              <div>
+                <img src={form.avatar} alt="preview" style={{ width: 60, height: 60, borderRadius: '50%', objectFit: 'cover', marginBottom: 8 }} />
+                <p style={{ margin: 0, fontSize: 13, color: '#666' }}>Click or drag to replace</p>
+              </div>
+            ) : (
+              <p style={{ margin: 0, color: '#888', fontSize: 14 }}>Drag & drop a photo here, or <span style={{ color: '#2d2d2d', fontWeight: 600 }}>browse files</span></p>
+            )}
+          </div>
+          <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} style={{ display: 'none' }} />
 
           <label style={labelStyle}>Bio</label>
           <textarea name="bio" placeholder="Tell clients about yourself..." value={form.bio} onChange={handleChange} rows={4} style={{ ...inputStyle, resize: 'vertical' }} />
