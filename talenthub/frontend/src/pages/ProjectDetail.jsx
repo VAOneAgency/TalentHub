@@ -73,7 +73,7 @@ export default function ProjectDetail() {
           <h1 className="detail-title">{project.title}</h1>
 
           <div className="detail-meta">
-            <span>Posted by <strong>@{project.postedBy?.name || project.postedBy?.email}</strong></span>
+            <span>Posted by <strong>@{project.postedBy?.username || project.postedBy?.email}</strong></span>
             <span className="dot">·</span>
             <span>Client</span>
           </div>
@@ -165,7 +165,7 @@ export default function ProjectDetail() {
             <div className="client-info">
               <div className="avatar" />
               <div>
-                <strong>@{project.postedBy?.name || project.postedBy?.email}</strong>
+                <strong>@{project.postedBy?.username || project.postedBy?.email}</strong>
                 <p>Member since {new Date(project.postedBy?.createdAt).getFullYear()}</p>
               </div>
             </div>
