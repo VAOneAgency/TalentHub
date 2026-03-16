@@ -58,6 +58,10 @@ export default function Navbar() {
         {user && user.role === 'freelancer' && (
           <Link to="/my-applications" style={linkStyle}>My Applications</Link>
         )}
+        
+        {user && (
+            <Link to="/profile" style={linkStyle}>Profile</Link>
+        )} 
 
         {!user ? (
           <>
