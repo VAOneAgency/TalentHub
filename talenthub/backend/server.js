@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const projectRoutes = require('./routes/projects');
 const applicationRoutes = require('./routes/applications');
 const authRoutes = require('./routes/auth'); 
+const profileRoutes = require('./routes/profile');
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use('/api/projects', projectRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/auth', authRoutes);  
+app.use('/api/profile', profileRoutes);
 
 // ─── Health check ─────────────────────────────────────────────────────────────
 app.get('/api/health', (req, res) => res.json({ status: 'ok', feature: 'projects-applications' }));
