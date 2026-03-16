@@ -7,6 +7,9 @@ export default function ProjectDetail() {
   const navigate = useNavigate();
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [portfolioUrl, setPortfolioUrl] = useState('');
+const [availability, setAvailability] = useState('');
+const [rate, setRate] = useState('');
   const [error, setError] = useState('');
 
   // Application form
@@ -38,7 +41,7 @@ export default function ProjectDetail() {
     setApplyError('');
     setApplySuccess('');
     try {
-      await applyToProject({ projectId: id, message });
+      await applyToProject({ projectId: id, message, portfolioUrl, availability, rate });
       setApplySuccess('Application submitted! You can track it from your dashboard.');
       setMessage('');
     } catch (err) {
@@ -134,18 +137,46 @@ export default function ProjectDetail() {
                 <p className="success-msg">{applySuccess}</p>
               ) : (
                 <form onSubmit={handleApply}>
-                  <textarea
-                    placeholder="Tell the client why you're the right fit..."
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    rows={5}
-                  />
-                  {applyError && <p className="error">{applyError}</p>}
-                  <button type="submit" className="btn-primary" disabled={applying}>
-                    {applying ? 'Submitting...' : 'Apply Now →'}
-                  </button>
-                  <p className="withdraw-note">Withdraw anytime from your dashboard</p>
-                </form>
+  <label className="form-label">Why are you the right fit? *</label>
+  <textarea
+    placeholder="Tell the client about your relevant experience..."
+    value={message}
+    onChange={(e) => setMessage(e.target.value)}
+    rows={4}
+    required
+  />
+
+  <label className="form-label">Portfolio / Work Samples URL</label>
+  <input
+    type="url"
+    placeholder="https://your-portfolio.com"
+    value={portfolioUrl}
+    onChange={(e) => setPortfolioUrl(e.target.value)}
+  />
+
+  <label className="form-label">Availability</label>
+  <select value={availability} onChange={(e) => setAvailability(e.target.value)}>
+    <option value="">Select availability...</option>
+    <option value="immediately">Immediately</option>
+    <option value="1-2 weeks">1–2 weeks</option>
+    <option value="1 month">1 month</option>
+    <option value="negotiable">Negotiable</option>
+  </select>
+
+  <label className="form-label">Proposed Rate (optional)</label>
+  <input
+    type="text"
+    placeholder="e.g. $50/hr or $1,200 flat"
+    value={rate}
+    onChange={(e) => setRate(e.target.value)}
+  />
+
+  {applyError && <p className="error">{applyError}</p>}
+  <button type="submit" className="btn-primary" disabled={applying || !message}>
+    {applying ? 'Submitting...' : 'Apply Now →'}
+  </button>
+  <p className="withdraw-note">Withdraw anytime from your dashboard</p>
+</form>
               )}
             </div>
           )}
