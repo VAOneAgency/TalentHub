@@ -3,7 +3,7 @@
  * Reads token from localStorage key 'talenthub_token'
  * (key set by partner's auth system — do NOT change)
  */
-const BASE = import.meta.env.VITE_API_URL || '/api';
+const BASE = 'https://talenthub-api-e0241deeaaab.herokuapp.com/api';
 
 const getToken = () => localStorage.getItem('talenthub_token');
 
@@ -49,10 +49,5 @@ export const updateApplicationStatus = (id, status) => request('PATCH', `/applic
 
 // GET /api/applications/check/:projectId
 // Returns { hasApplied: boolean } for the current authenticated user
-export const checkHasApplied = async (projectId) => {
-  const res = await fetch(`/api/applications/check/${projectId}`, {
-    headers: getAuthHeaders(),
-  });
-  if (!res.ok) throw new Error('Failed to check application status');
-  return res.json();
-};
+export const checkHasApplied = (projectId) =>
+  request('GET', `/applications/check/${projectId}`);
