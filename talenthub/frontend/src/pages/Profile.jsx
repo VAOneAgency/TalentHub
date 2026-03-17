@@ -15,9 +15,7 @@ export default function Profile() {
   useEffect(() => {
     const fetchProfile = async () => {
       const token = localStorage.getItem('talenthub_token');
-      const res = await fetch('/api/profile/me', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await request('GET', '/profile/me');
       const data = await res.json();
       setProfile(data);
       setForm({
@@ -39,11 +37,7 @@ export default function Profile() {
     const token = localStorage.getItem('talenthub_token');
     const formData = new FormData();
     formData.append('avatar', file);
-    const res = await fetch('/api/upload/avatar', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}` },
-      body: formData,
-    });
+    const res = await request('POST', '/upload/avatar', formData);
     const data = await res.json();
     setUploading(false);
     if (data.url) setForm((f) => ({ ...f, avatar: data.url }));

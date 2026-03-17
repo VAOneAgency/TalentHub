@@ -16,11 +16,7 @@ export default function Login() {
     e.preventDefault();
     setError('');
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      });
+      const res = await request('POST', '/auth/login', form);
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
       login(data.token, data.user);
@@ -80,4 +76,11 @@ export default function Login() {
       <p style={{ marginTop: 16, fontSize: 14 }}>No account yet? <Link to="/register">Register</Link></p>
     </div>
   );
+}
+
+function request(method, url, data) {
+  const token = localStorage.getItem('token');
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return fetch(url, { method, headers, body: JSON.stringify(data) });
 }

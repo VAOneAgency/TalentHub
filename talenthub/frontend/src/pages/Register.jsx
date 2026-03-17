@@ -17,11 +17,7 @@ export default function Register() {
     setError('');
     if (form.password !== form.confirmPassword) return setError('Passwords do not match');
     try {
-      const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: form.username, email: form.email, password: form.password, role: form.role }),
-      });
+      const res = await request('POST', '/auth/register', { username: form.username, email: form.email, password: form.password, role: form.role });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
       login(data.token, data.user);
