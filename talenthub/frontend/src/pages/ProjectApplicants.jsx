@@ -19,15 +19,25 @@ export default function ProjectApplicants() {
   }, [id]);
 
   const handleStatusChange = async (appId, status) => {
+    // Optimistic UI update
+    setApplications((prev) =>
+      prev.map((a) => (a._id === appId ? { ...a, status } : a))
+    );
+    if (selected?._id === appId) setSelected((prev) => ({ ...prev, status }));
+
     try {
       const updated = await updateApplicationStatus(appId, status);
       setApplications((prev) =>
         prev.map((a) => (a._id === appId ? { ...a, status: updated.status } : a))
       );
-      // keep modal in sync
       if (selected?._id === appId) setSelected((prev) => ({ ...prev, status: updated.status }));
     } catch (err) {
       alert(err.message);
+      // Revert optimistic update on error
+      setApplications((prev) =>
+        prev.map((a) => (a._id === appId ? { ...a, status: a.status } : a))
+      );
+      if (selected?._id === appId) setSelected((prev) => ({ ...prev, status: prev.status }));
     }
   };
 
@@ -133,6 +143,13 @@ export default function ProjectApplicants() {
                 <a href={selected.portfolioUrl} target="_blank" rel="noreferrer">
                   {selected.portfolioUrl}
                 </a>
+                <div className="portfolio-preview">
+                  <iframe
+                    src={selected.portfolioUrl}
+                    title="Portfolio Preview"
+                    style={{ width: '100%', height: '300px', border: '1px solid #ccc', marginTop: '10px' }}
+                  />
+                </div>
               </div>
             )}
 

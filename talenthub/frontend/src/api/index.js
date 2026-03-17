@@ -46,3 +46,13 @@ export const getMyApplications = () => request('GET', '/applications/my');
 export const getProjectApplications = (projectId) => request('GET', `/applications/project/${projectId}`);
 export const withdrawApplication = (id) => request('DELETE', `/applications/${id}`);
 export const updateApplicationStatus = (id, status) => request('PATCH', `/applications/${id}/status`, { status });
+
+// GET /api/applications/check/:projectId
+// Returns { hasApplied: boolean } for the current authenticated user
+export const checkHasApplied = async (projectId) => {
+  const res = await fetch(`/api/applications/check/${projectId}`, {
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) throw new Error('Failed to check application status');
+  return res.json();
+};

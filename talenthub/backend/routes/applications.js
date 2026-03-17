@@ -21,4 +21,17 @@ router.delete('/:id', requireRole('freelancer'), deleteApplication);
 router.get('/project/:projectId', requireRole('client'), getProjectApplications);
 router.patch('/:id/status', requireRole('client'), updateApplicationStatus);
 
+// GET /api/applications/check/:projectId
+router.get('/check/:projectId', protect, async (req, res) => {
+  try {
+    const existing = await Application.findOne({
+      projectId: req.params.projectId,
+      applicantId: req.user._id,
+    });
+    res.json({ hasApplied: !!existing });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 module.exports = router;

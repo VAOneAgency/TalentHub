@@ -13,6 +13,7 @@ import Navbar from './components/Navbar';
 import { AuthProvider } from './context/AuthContext';
 import './styles.css';
 import Profile from './pages/Profile';
+import PostProject from './pages/PostProject';
 
 export default function App() {
   return (
@@ -56,6 +57,11 @@ export default function App() {
           <Route path="/projects/:id/applicants" element={
             <ProtectedRoute allowedRoles={['client']}>
               <ProjectApplicants />
+            </ProtectedRoute>
+          } />
+          <Route path="/post-project" element={
+            <ProtectedRoute allowedRoles={['client']}>
+              <PostProject />
             </ProtectedRoute>
           } />
 
