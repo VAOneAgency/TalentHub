@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Eye, EyeOff } from 'lucide-react';
+import { request } from '../api/index';
 
 export default function Register() {
   const { login } = useAuth();
@@ -17,9 +18,13 @@ export default function Register() {
     setError('');
     if (form.password !== form.confirmPassword) return setError('Passwords do not match');
     try {
-      const res = await request('POST', '/auth/register', { username: form.username, email: form.email, password: form.password, role: form.role });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
+      const data = await request('POST', '/auth/register', {
+        username: form.username,
+        email: form.email,
+        password: form.password,
+        role: form.role
+      });
+
       login(data.token, data.user);
       navigate('/');
     } catch (err) {

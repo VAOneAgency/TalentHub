@@ -29,6 +29,8 @@ const request = async (method, path, body) => {
   return data;
 };
 
+export { request };
+
 // ─── Projects ─────────────────────────────────────────────────────────────────
 export const getProjects = (params = {}) => {
   const qs = new URLSearchParams(params).toString();
