@@ -11,6 +11,7 @@ const uploadRoutes = require('./routes/upload');
 const app = express();
 
 app.use(cors());
+app.options('*', cors());
 app.use(express.json());
 
 // ─── Routes owned by this feature ────────────────────────────────────────────
