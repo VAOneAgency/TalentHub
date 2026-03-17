@@ -501,3 +501,97 @@ textarea { resize: vertical; min-height: 100px; }
   .browse-header { flex-direction: column; align-items: flex-start; }
   .search-bar { max-width: 100%; width: 100%; }
 }
+
+.applicant-details {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 10px 0;
+}
+
+.detail-item {
+  display: flex;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.detail-item label {
+  font-weight: 600;
+  min-width: 110px;
+  color: var(--text-secondary);
+}
+
+.applicant-card.clickable {
+  cursor: pointer;
+  transition: box-shadow 0.15s ease;
+}
+.applicant-card.clickable:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.applicant-preview {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin: 4px 0 0;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.modal-panel {
+  background: white;
+  border-radius: 12px;
+  padding: 32px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+}
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.applicant-avatar.large {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--border-color, #ddd);
+  flex-shrink: 0;
+}
+.modal-section {
+  margin-bottom: 20px;
+}
+.modal-section label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.modal-section p,
+.modal-section a {
+  font-size: 0.95rem;
+  line-height: 1.5;
+}

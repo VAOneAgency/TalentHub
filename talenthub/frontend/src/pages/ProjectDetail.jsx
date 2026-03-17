@@ -1,13 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getProjectById, applyToProject } from '../api';
+import { getProjectById, applyToProject, checkHasApplied } from '../api';
+// Note: checkHasApplied should call GET /api/applications/check/:projectId
+// It returns { hasApplied: boolean } for the current authenticated user only.
+// Do NOT use getProjectApplications here — that endpoint is owner-only and
+// would expose all applicants to any freelancer who calls it directly.
 
 export default function ProjectDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [portfolioUrl, setPortfolioUrl] = useState('');
+  const [availability, setAvailability] = useState('');
+  const [rate, setRate] = useState('');
   const [error, setError] = useState('');
+  const [hasApplied, setHasApplied] = useState(false);
 
   // Application form
   const [message, setMessage] = useState('');
@@ -15,9 +23,9 @@ export default function ProjectDetail() {
   const [applySuccess, setApplySuccess] = useState('');
   const [applyError, setApplyError] = useState('');
 
-  // Get current user from localStorage (set by partner's auth)
   const user = JSON.parse(localStorage.getItem('talenthub_user') || 'null');
 
+  // Load project data
   useEffect(() => {
     const load = async () => {
       try {
@@ -32,15 +40,31 @@ export default function ProjectDetail() {
     load();
   }, [id]);
 
+  // Check application status — uses a dedicated lightweight endpoint,
+  // not getProjectApplications which is restricted to project owners.
+  useEffect(() => {
+    if (!user || user.role !== 'freelancer') return;
+    checkHasApplied(id)
+      .then(({ hasApplied }) => setHasApplied(hasApplied))
+      .catch((err) => console.error('Could not check application status:', err));
+  }, [id]);
+
   const handleApply = async (e) => {
     e.preventDefault();
+    // Belt-and-suspenders guard — the form should already be hidden if hasApplied,
+    // but this prevents a race condition if state updates are delayed.
+    if (hasApplied) {
+      setApplyError('You have already applied to this project.');
+      return;
+    }
     setApplying(true);
     setApplyError('');
     setApplySuccess('');
     try {
-      await applyToProject({ projectId: id, message });
+      await applyToProject({ projectId: id, message, portfolioUrl, availability, rate });
       setApplySuccess('Application submitted! You can track it from your dashboard.');
       setMessage('');
+      setHasApplied(true);
     } catch (err) {
       setApplyError(err.message);
     } finally {
@@ -54,7 +78,9 @@ export default function ProjectDetail() {
 
   const isOwner = user && project.postedBy?._id === user.id;
   const isFreelancer = user?.role === 'freelancer';
-  const postedDate = new Date(project.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  const postedDate = new Date(project.createdAt).toLocaleDateString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric',
+  });
 
   return (
     <div className="detail-page">
@@ -91,7 +117,9 @@ export default function ProjectDetail() {
 
           {isOwner && (
             <div className="owner-actions">
-              <button onClick={() => navigate(`/projects/${id}/edit`)} className="btn-secondary">Edit Project</button>
+              <button onClick={() => navigate(`/projects/${id}/edit`)} className="btn-secondary">
+                Edit Project
+              </button>
             </div>
           )}
         </div>
@@ -126,22 +154,54 @@ export default function ProjectDetail() {
             </div>
           </div>
 
-          {/* Apply form — shown only to freelancers when project is open */}
+          {/* Apply form — shown only to freelancers on open projects they haven't applied to */}
           {isFreelancer && project.status === 'open' && (
             <div className="sidebar-card apply-card">
               <h4>SUBMIT APPLICATION</h4>
               {applySuccess ? (
                 <p className="success-msg">{applySuccess}</p>
+              ) : hasApplied ? (
+                <p className="already-applied-msg">
+                  You've already applied to this project. Track your application from your dashboard.
+                </p>
               ) : (
                 <form onSubmit={handleApply}>
+                  <label className="form-label">Why are you the right fit? *</label>
                   <textarea
-                    placeholder="Tell the client why you're the right fit..."
+                    placeholder="Tell the client about your relevant experience..."
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    rows={5}
+                    rows={4}
+                    required
                   />
+
+                  <label className="form-label">Portfolio / Work Samples URL</label>
+                  <input
+                    type="url"
+                    placeholder="https://your-portfolio.com"
+                    value={portfolioUrl}
+                    onChange={(e) => setPortfolioUrl(e.target.value)}
+                  />
+
+                  <label className="form-label">Availability</label>
+                  <select value={availability} onChange={(e) => setAvailability(e.target.value)}>
+                    <option value="">Select availability...</option>
+                    <option value="immediately">Immediately</option>
+                    <option value="1-2 weeks">1–2 weeks</option>
+                    <option value="1 month">1 month</option>
+                    <option value="negotiable">Negotiable</option>
+                  </select>
+
+                  <label className="form-label">Proposed Rate (optional)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. $50/hr or $1,200 flat"
+                    value={rate}
+                    onChange={(e) => setRate(e.target.value)}
+                  />
+
                   {applyError && <p className="error">{applyError}</p>}
-                  <button type="submit" className="btn-primary" disabled={applying}>
+                  <button type="submit" className="btn-primary" disabled={applying || !message}>
                     {applying ? 'Submitting...' : 'Apply Now →'}
                   </button>
                   <p className="withdraw-note">Withdraw anytime from your dashboard</p>

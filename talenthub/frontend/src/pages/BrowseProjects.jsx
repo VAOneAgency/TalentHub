@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { memo, useEffect, useState, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { getProjects } from '../api';
+import debounce from 'lodash.debounce';
 
 const CATEGORIES = ['All', 'Design', 'Development', 'Marketing', 'Writing', 'Other'];
 
@@ -13,13 +14,23 @@ export default function BrowseProjects() {
   const [category, setCategory] = useState('');
   const [page, setPage] = useState(1);
 
-  const fetchProjects = async () => {
+  // Use a ref to always read the latest search value inside the debounced function,
+  // avoiding the stale closure problem that occurs when fetchProjects is recreated each render.
+  const searchRef = useRef(search);
+  const categoryRef = useRef(category);
+  const pageRef = useRef(page);
+
+  useEffect(() => { searchRef.current = search; }, [search]);
+  useEffect(() => { categoryRef.current = category; }, [category]);
+  useEffect(() => { pageRef.current = page; }, [page]);
+
+  const fetchProjects = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
-      const params = { page, limit: 12 };
-      if (search) params.search = search;
-      if (category && category !== 'All') params.category = category;
+      const params = { page: pageRef.current, limit: 12 };
+      if (searchRef.current) params.search = searchRef.current;
+      if (categoryRef.current && categoryRef.current !== 'All') params.category = categoryRef.current;
       const data = await getProjects(params);
       setProjects(data.projects);
       setPagination(data.pagination);
@@ -28,26 +39,38 @@ export default function BrowseProjects() {
     } finally {
       setLoading(false);
     }
+  }, []); // stable — reads latest values via refs
+
+  // Debounced version for live search input. Stable reference across renders.
+  const debouncedFetch = useCallback(debounce(() => fetchProjects(), 350), [fetchProjects]);
+
+  // Fetch on mount, page change, and category change (immediate, no debounce needed)
+  useEffect(() => {
+    fetchProjects();
+  }, [page, category, fetchProjects]);
+
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    setPage(1);
+    debouncedFetch();
   };
 
-  useEffect(() => { fetchProjects(); }, [page, category]);
-
-  const handleSearch = (e) => {
+  // Explicit submit still works (e.g. pressing Enter or clicking Search)
+  const handleSearchSubmit = (e) => {
     e.preventDefault();
-    setPage(1);
-    fetchProjects();
+    debouncedFetch.flush(); // fire immediately instead of waiting for the debounce timer
   };
 
   return (
     <div className="browse-page">
       <div className="browse-header">
         <h1>Browse Projects</h1>
-        <form onSubmit={handleSearch} className="search-bar">
+        <form onSubmit={handleSearchSubmit} className="search-bar">
           <input
             type="text"
             placeholder="Search projects..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={handleSearchChange}
           />
           <button type="submit">Search</button>
         </form>
@@ -94,7 +117,7 @@ export default function BrowseProjects() {
   );
 }
 
-function ProjectCard({ project }) {
+const ProjectCard = memo(function ProjectCard({ project }) {
   return (
     <Link to={`/projects/${project._id}`} className="project-card">
       <div className="card-top">
@@ -114,4 +137,4 @@ function ProjectCard({ project }) {
       </div>
     </Link>
   );
-}
+});

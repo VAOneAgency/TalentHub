@@ -3,7 +3,7 @@
  * Reads token from localStorage key 'talenthub_token'
  * (key set by partner's auth system — do NOT change)
  */
-const BASE = import.meta.env.VITE_API_URL || '/api';
+const BASE = 'https://talenthub-api-e0241deeaaab.herokuapp.com/api';
 
 const getToken = () => localStorage.getItem('talenthub_token');
 
@@ -15,12 +15,21 @@ const request = async (method, path, body) => {
   const token = getToken();
   if (token) opts.headers['Authorization'] = `Bearer ${token}`;
   if (body) opts.body = JSON.stringify(body);
-
   const res = await fetch(`${BASE}${path}`, opts);
-  const data = await res.json();
+  const text = await res.text();
+  let data = {};
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = { message: text };
+    }
+  }
   if (!res.ok) throw new Error(data.message || 'Request failed');
   return data;
 };
+
+export { request };
 
 // ─── Projects ─────────────────────────────────────────────────────────────────
 export const getProjects = (params = {}) => {
@@ -39,3 +48,8 @@ export const getMyApplications = () => request('GET', '/applications/my');
 export const getProjectApplications = (projectId) => request('GET', `/applications/project/${projectId}`);
 export const withdrawApplication = (id) => request('DELETE', `/applications/${id}`);
 export const updateApplicationStatus = (id, status) => request('PATCH', `/applications/${id}/status`, { status });
+
+// GET /api/applications/check/:projectId
+// Returns { hasApplied: boolean } for the current authenticated user
+export const checkHasApplied = (projectId) =>
+  request('GET', `/applications/check/${projectId}`);

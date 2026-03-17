@@ -5,7 +5,7 @@ const Project = require('../models/Project');
 // Freelancer submits application
 const createApplication = async (req, res) => {
   try {
-    const { projectId, message } = req.body;
+    const { projectId, message, portfolioUrl, availability, rate } = req.body;
 
     const project = await Project.findById(projectId);
     if (!project) return res.status(404).json({ message: 'Project not found' });
@@ -23,6 +23,9 @@ const createApplication = async (req, res) => {
       projectId,
       applicantId: req.user.id,
       message,
+      portfolioUrl,
+      availability,
+      rate,
     });
 
     res.status(201).json(application);

@@ -22,6 +22,15 @@ const applicationSchema = new mongoose.Schema(
       enum: ['pending', 'reviewed', 'accepted', 'rejected'],
       default: 'pending',
     },
+    portfolioUrl: {
+      type: String,
+    },
+    availability: {
+      type: String,
+    },
+    rate: {
+      type: String,
+    },
   },
   {
     timestamps: true, // appliedAt = createdAt

@@ -13,6 +13,7 @@ import Navbar from './components/Navbar';
 import { AuthProvider } from './context/AuthContext';
 import './styles.css';
 import Profile from './pages/Profile';
+import PostProject from './pages/PostProject';
 
 export default function App() {
   return (
@@ -26,19 +27,28 @@ export default function App() {
 
           {/* Public */}
           <Route path="/projects" element={<BrowseProjects />} />
-          <Route path="/projects/:id" element={<ProjectDetail />} />
 
-          {/* Any logged in user */}
+          {/* ⚠️ FIXED: specific routes BEFORE /:id so "new" isn't swallowed as an id */}
           <Route path="/projects/new" element={
             <ProtectedRoute>
               <ProjectForm />
             </ProtectedRoute>
           } />
+
           <Route path="/projects/:id/edit" element={
             <ProtectedRoute>
               <ProjectForm />
             </ProtectedRoute>
           } />
+
+          <Route path="/projects/:id/applicants" element={
+            <ProtectedRoute allowedRoles={['client']}>
+              <ProjectApplicants />
+            </ProtectedRoute>
+          } />
+
+          {/* ⚠️ FIXED: moved after all /projects/something specific routes */}
+          <Route path="/projects/:id" element={<ProjectDetail />} />
 
           {/* Freelancer only */}
           <Route path="/my-applications" element={
@@ -53,9 +63,10 @@ export default function App() {
               <MyListings />
             </ProtectedRoute>
           } />
-          <Route path="/projects/:id/applicants" element={
+
+          <Route path="/post-project" element={
             <ProtectedRoute allowedRoles={['client']}>
-              <ProjectApplicants />
+              <PostProject />
             </ProtectedRoute>
           } />
 
