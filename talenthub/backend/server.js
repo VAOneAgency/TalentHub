@@ -10,16 +10,7 @@ const uploadRoutes = require('./routes/upload');
 
 const app = express();
 
-const corsOptions = {
-  origin: [
-    'http://localhost:5173',
-    'http://localhost:3000',
-    'https://relaxed-chebakia-ed8756.netlify.app',
-  ],
-  credentials: true,
-};
-
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 
 // ─── Routes owned by this feature ────────────────────────────────────────────
