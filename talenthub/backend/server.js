@@ -4,20 +4,19 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const projectRoutes = require('./routes/projects');
 const applicationRoutes = require('./routes/applications');
-const authRoutes = require('./routes/auth'); 
+const authRoutes = require('./routes/auth');
 const profileRoutes = require('./routes/profile');
 const uploadRoutes = require('./routes/upload');
 
 const app = express();
 
 app.use(cors());
-app.options('*', cors());
 app.use(express.json());
 
 // ─── Routes owned by this feature ────────────────────────────────────────────
 app.use('/api/projects', projectRoutes);
 app.use('/api/applications', applicationRoutes);
-app.use('/api/auth', authRoutes);  
+app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/upload', uploadRoutes);
 
@@ -33,11 +32,11 @@ console.log('Connecting to MongoDB with URI:', MONGO_URI);
 mongoose
   .connect(MONGO_URI)
   .then(() => {
-    console.log('MongoDB connected');
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    console.log('✅ MongoDB connected');
+    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
   })
   .catch((err) => {
-    console.error('MongoDB connection error:', err);
+    console.error('❌ MongoDB connection error:', err);
     process.exit(1);
   });
 
