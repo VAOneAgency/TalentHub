@@ -53,4 +53,4 @@ export const updateApplicationStatus = (id, status) => request('PATCH', `/applic
 // GET /api/applications/check/:projectId
 // Returns { hasApplied: boolean } for the current authenticated user
 export const checkHasApplied = (projectId) =>
-  request('GET', `/applications/check/${projectId}`);
+  request('GET', `/applications/check/${projectId}`)
