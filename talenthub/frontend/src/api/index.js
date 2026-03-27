@@ -3,7 +3,8 @@
  * Reads token from localStorage key 'talenthub_token'
  * (key set by partner's auth system — do NOT change)
  */
-const BASE = import.meta.env.VITE_API_URL || '/api';
+const BASE = import.meta.env.VITE_API_URL || 'https://talenthub-api-e0241deeaaab.herokuapp.com/api';
+
 
 const getToken = () => localStorage.getItem('talenthub_token');
 
