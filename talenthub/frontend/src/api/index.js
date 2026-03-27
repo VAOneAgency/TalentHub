@@ -3,39 +3,38 @@
  * Reads token from localStorage key 'talenthub_token'
  * (key set by partner's auth system — do NOT change)
  */
-const BASE = import.meta.env.VITE_API_URL || 'https://talenthub-api-e0241deeaaab.herokuapp.com/api';
-
+const BASE = import.meta.env.VITE_API_URL || '/api';
 
 const getToken = () => localStorage.getItem('talenthub_token');
 
 const request = async (method, path, body) => {
-  const opts = {
-    method,
-    headers: { 'Content-Type': 'application/json' },
-  };
-  const token = getToken();
-  if (token) opts.headers['Authorization'] = `Bearer ${token}`;
-  if (body) opts.body = JSON.stringify(body);
-  const res = await fetch(`${BASE}${path}`, opts);
-  const text = await res.text();
-  let data = {};
-  if (text) {
-    try {
-      data = JSON.parse(text);
-    } catch {
-      data = { message: text };
-    }
-  }
-  if (!res.ok) throw new Error(data.message || 'Request failed');
-  return data;
+  const opts = {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+  };
+  const token = getToken();
+  if (token) opts.headers['Authorization'] = `Bearer ${token}`;
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(`${BASE}${path}`, opts);
+  const text = await res.text();
+  let data = {};
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = { message: text };
+    }
+  }
+  if (!res.ok) throw new Error(data.message || 'Request failed');
+  return data;
 };
 
 export { request };
 
 // ─── Projects ─────────────────────────────────────────────────────────────────
 export const getProjects = (params = {}) => {
-  const qs = new URLSearchParams(params).toString();
-  return request('GET', `/projects${qs ? `?${qs}` : ''}`);
+  const qs = new URLSearchParams(params).toString();
+  return request('GET', `/projects${qs ? `?${qs}` : ''}`);
 };
 export const getProjectById = (id) => request('GET', `/projects/${id}`);
 export const getMyProjects = () => request('GET', '/projects/my/listings');
@@ -53,4 +52,4 @@ export const updateApplicationStatus = (id, status) => request('PATCH', `/applic
 // GET /api/applications/check/:projectId
 // Returns { hasApplied: boolean } for the current authenticated user
 export const checkHasApplied = (projectId) =>
-  request('GET', `/applications/check/${projectId}`);
+  request('GET', `/applications/check/${projectId}`)

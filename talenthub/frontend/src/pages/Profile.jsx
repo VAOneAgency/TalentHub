@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 
+
 export default function Profile() {
   const { user } = useAuth();
   const [profile, setProfile] = useState(null);
@@ -14,34 +15,40 @@ export default function Profile() {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const token = localStorage.getItem('talenthub_token');
-      const res = await request('GET', '/profile/me');
-      const data = await res.json();
-      setProfile(data);
-      setForm({
-        avatar: data.avatar || '',
-        bio: data.bio || '',
-        portfolio: data.portfolio || '',
-        resume: data.resume || '',
-        linkedin: data.linkedin || '',
-        github: data.github || '',
-      });
-    };
+  const token = localStorage.getItem('talenthub_token');
+  const res = await fetch('/api/profile/me', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  const data = await res.json();
+  setProfile(data);
+  setForm({
+    avatar: data.avatar || '',
+    bio: data.bio || '',
+    portfolio: data.portfolio || '',
+    resume: data.resume || '',
+    linkedin: data.linkedin || '',
+    github: data.github || '',
+  });
+};
     fetchProfile();
   }, []);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const uploadAvatar = async (file) => {
-    setUploading(true);
-    const token = localStorage.getItem('talenthub_token');
-    const formData = new FormData();
-    formData.append('avatar', file);
-    const res = await request('POST', '/upload/avatar', formData);
-    const data = await res.json();
-    setUploading(false);
-    if (data.url) setForm((f) => ({ ...f, avatar: data.url }));
-  };
+  setUploading(true);
+  const token = localStorage.getItem('talenthub_token');
+  const formData = new FormData();
+  formData.append('avatar', file);
+  const res = await fetch('/api/upload/avatar', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+  });
+  const data = await res.json();
+  setUploading(false);
+  if (data.url) setForm((f) => ({ ...f, avatar: data.url }));
+};
 
   const handleFileDrop = (e) => {
     e.preventDefault();
